@@ -29,6 +29,14 @@ Or, from inside a Claude Code session:
 | :- | :- |
 | [flow](plugins/flow) | Task workflow for git: start a branch, commit with Conventional Commits, and finish with a PR/MR on GitHub or GitLab |
 
+### flow
+
+| Skill | What it does |
+| :- | :- |
+| `/flow:start [type] <description>` | Updates the default branch and creates `<type>/<short-description>` |
+| `/flow:commit [hint]` | Splits the changes into one commit per domain as `type(domain): mensagem` (in Portuguese) and pushes after each commit. On the default branch, only `chore`/`docs`/`ci`/`build`/`style` go straight in |
+| `/flow:finish [keep]` | Bumps the version (semver) if it wasn't bumped, opens the PR/MR to the default branch, waits for the pipeline, merges it and deletes the branch. `keep` keeps the branch. Conflicts are reported, never resolved |
+
 ## Layout
 
 ```text
