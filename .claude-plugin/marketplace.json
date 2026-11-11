@@ -1,0 +1,9 @@
+{
+  "name": "raquinos-dev-kit",
+  "description": "Renato Aquino's development skills and plugins for Claude Code",
+  "owner": {
+    "name": "Renato Aquino",
+    "url": "https://github.com/renato-aq"
+  },
+  "plugins": []
+}
