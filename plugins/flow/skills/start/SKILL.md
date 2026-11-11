@@ -53,3 +53,5 @@ Don't push the branch here; `/flow:commit` publishes it on the first commit.
 ## 6. Report
 
 Tell the user in one or two lines the branch that was created, which branch it was cut from and its commit, and whether the stashed changes were brought along or are still stashed.
+
+Don't start working on the task: don't read or change code, plan, or suggest an implementation. Stop after the report and wait for the user.
