@@ -27,7 +27,7 @@ Or, from inside a Claude Code session:
 
 | Plugin | Description |
 | :- | :- |
-| _coming soon_ | |
+| [flow](plugins/flow) | Task workflow for git: start a branch, commit with Conventional Commits, and finish with a PR/MR on GitHub or GitLab |
 
 ## Layout
 

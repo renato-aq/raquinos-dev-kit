@@ -5,5 +5,11 @@
     "name": "Renato Aquino",
     "url": "https://github.com/renato-aq"
   },
-  "plugins": []
+  "plugins": [
+    {
+      "name": "flow",
+      "source": "./plugins/flow",
+      "description": "Task workflow for git: start a branch, commit with Conventional Commits, and finish with a PR/MR on GitHub or GitLab"
+    }
+  ]
 }
