@@ -1,0 +1,14 @@
+{
+  "name": "flow",
+  "displayName": "Flow",
+  "version": "0.1.0",
+  "description": "Task workflow for git: start a branch, commit with Conventional Commits, and finish with a PR/MR on GitHub or GitLab",
+  "author": {
+    "name": "Renato Aquino",
+    "url": "https://github.com/renato-aq"
+  },
+  "homepage": "https://github.com/renato-aq/raquinos-dev-kit/tree/main/plugins/flow",
+  "repository": "https://github.com/renato-aq/raquinos-dev-kit",
+  "license": "MIT",
+  "keywords": ["git", "workflow", "branch", "conventional-commits", "pull-request", "merge-request"]
+}
