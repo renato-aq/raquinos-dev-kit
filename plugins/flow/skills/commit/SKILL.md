@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Commit the current changes as Conventional Commits in the format type(domain): message, with the message in Portuguese, splitting the diff into one commit per domain and pushing after each commit. On the default branch, only simple changes (chore, docs, ci, build, style) are committed and pushed directly. Use when the user wants to commit, save or push their work.
+description: Commit the current changes as Conventional Commits in the format type(domain): message, with the message in Portuguese, splitting the diff into one commit per domain and pushing after each commit. On the default branch, only simple changes (chore, docs, ci, build, style) are committed and pushed directly. Use when the user wants to commit or save their work.
 argument-hint: "[hint about the change]"
 allowed-tools: Bash(git *)
 ---
