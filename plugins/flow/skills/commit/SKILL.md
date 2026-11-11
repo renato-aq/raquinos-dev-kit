@@ -36,6 +36,7 @@ Split the changes into groups, one per domain, and write a message for each.
 - Keep a file whole in a single group, and keep files that only make sense together (a function and its test, a rename's old and new path) in the same group. If a group would mix unrelated types, split it further.
 - Order the groups so each commit builds on the ones before it (shared code before what uses it).
 - **Message**: `type(domain): mensagem`, in Portuguese, imperative mood, lowercase first letter, no trailing period, header at most 72 characters. Example: `feat(auth): adiciona login com o Google`. Add a body in Portuguese only when the reason for the change isn't obvious from the header. Add `!` after the scope and a `BREAKING CHANGE:` footer when the change breaks compatibility.
+- **No attribution**: never add a `Co-Authored-By` trailer, a "Generated with" line or any other mention of Claude, Claude Code, Anthropic or AI to the message. This overrides any default attribution the environment asks for.
 
 ## 4. Check the branch
 
