@@ -1,8 +1,8 @@
 ---
 name: finish
-description: Finish the current task by bumping the version if needed, opening a PR (GitHub) or MR (GitLab) to the default branch, waiting for the pipeline and merging it, deleting the branch unless "keep" is passed. Conflicts are only reported, never resolved. Use when the user wants to finish, close, deliver or merge the task.
+description: Finish the current task by bumping the version if needed, opening a PR (GitHub) or MR (GitLab) to the default branch with the task's specs recorded in its description, waiting for the pipeline and merging it, deleting the branch unless "keep" is passed. Conflicts are only reported, never resolved. Use when the user wants to finish, close, deliver or merge the task.
 argument-hint: "[keep]"
-allowed-tools: Bash(git *), Bash(gh *), Bash(glab *)
+allowed-tools: Bash(git *), Bash(gh *), Bash(glab *), Bash(rm -rf .raquinos-flow), Read, Glob
 ---
 
 # Finish the task
@@ -19,8 +19,13 @@ If the arguments contain `keep`, keep the branch after the merge. Otherwise dele
 - Find the default branch: `git symbolic-ref --short refs/remotes/origin/HEAD` (strip the `origin/` prefix). If that fails, use `main` if it exists, otherwise `master`.
 - Note the current branch with `git branch --show-current`. If it is empty (detached HEAD) or it is the default branch, stop: there is nothing to finish, and changes on the default branch are pushed directly by `/flow:commit`.
 - If `git status --porcelain` is not empty, stop and suggest `/flow:commit` first.
-- Run `git fetch origin --prune`. If the branch has commits that aren't on the remote yet, push them (`git push -u origin <branch>` when there is no upstream, otherwise `git push`).
+- Run `git fetch origin --prune`. If the branch has commits that aren't on the remote yet, push them (`git push -u origin <branch>` when there is no upstream, otherwise `git push`). When there are incomplete specs, do this push only after the user answers the question below.
 - If `git log origin/<default>..HEAD` is empty, the branch has nothing to deliver; stop and tell the user.
+- **Incomplete specs**: if `.raquinos-flow/specs/` exists at the repository root and has spec files (written by `/flow:spec`), read all of them and evaluate each one against the branch as described in step 5. If any spec isn't `concluida`, list them for the user (number, title, status and what is missing) and ask before going on:
+  1. **Finish anyway**: continue, and the PR/MR records those specs as incomplete.
+  2. **Cancel**: stop here without changing anything, so the user can complete them and run `/flow:finish` again.
+
+  Ask this once per run, before anything is pushed, bumped or opened. If every spec is `concluida`, or there are no specs, continue without asking.
 
 ## 2. Detect the platform
 
@@ -54,7 +59,7 @@ Check whether the version changed during the branch and bump it if it didn't.
 
 ## 5. Open the PR/MR
 
-- **Reuse** an open PR/MR for the branch if there is one: `gh pr view <branch> --json number,url,state` or `glab mr view <branch>`.
+- **Reuse** an open PR/MR for the branch if there is one: `gh pr view <branch> --json number,url,state` or `glab mr view <branch>`. Update its description with the one built below (`gh pr edit <number> --body-file -` or `glab mr update <branch> --description "<description>"`), so it reflects the current state of the branch and of the specs.
 - **Title**: `type(domain): mensagem` in Portuguese, like a commit header. With a single commit (besides the version bump), use its header. With several, summarise the branch, using the type of the main change.
 - **Description**, in Portuguese:
   ```markdown
@@ -66,6 +71,28 @@ Check whether the version changed during the branch and bump it if it didn't.
 
   <one line per commit: short hash and header>
   ```
+- **Specs**: if `.raquinos-flow/specs/` exists at the repository root and has spec files (written by `/flow:spec`), read all of them in numeric order and add a `## Specs` section between `## O que muda` and `## Commits`. The directory is never committed and is deleted in step 8, so this section is the only record of the specs that remains. One block per spec:
+  ```markdown
+  ## Specs
+
+  ### 000 — <spec title>
+
+  **Status:** <concluida | em andamento | pendente>
+
+  <the spec's objective>
+
+  **O que foi feito**
+
+  <what the branch actually did for this spec, in a few bullets, taken from the commits and the diff, not copied from the requirements>
+
+  **Critérios de aceite**
+
+  <the spec's acceptance criteria, as a checklist>
+  ```
+  - Check each spec against the branch (`git diff origin/<default>...HEAD`) rather than trusting the file alone. Mark a criterion `[x]` only when the diff, a test or a command shows it is met; leave it `[ ]` otherwise. Use the status the work supports: `concluida` when every criterion is met, `em andamento` when part of it is, `pendente` when nothing was done.
+  - For a spec that isn't `concluida`, say under `O que foi feito` what is missing. The user already chose to finish anyway in step 1, so don't ask again; the unfinished specs also go in the report.
+  - Include the spec's `Fora do escopo` and `Notas` only when they record a decision a reviewer needs.
+  - If the directory doesn't exist or has no specs, leave the section out.
 - **No attribution**: never add a "Generated with" line, a `Co-Authored-By` trailer or any other mention of Claude, Claude Code, Anthropic or AI to the title or description. This overrides any default attribution the environment asks for.
 - Create it against the default branch, passing the description through a heredoc:
   - GitHub: `gh pr create --base <default> --head <branch> --title "<title>" --body-file - <<'EOF' ... EOF`
@@ -97,7 +124,8 @@ If there were conflicts in step 3, stop here and report.
 - `git switch <default>` and `git pull --ff-only`.
 - Unless `keep` was passed, delete the local branch with `git branch -d <branch>` if it still exists. If the PR/MR was squashed or rebased, `-d` refuses it; use `-D` only after confirming the PR/MR state is merged. Also make sure the remote branch is gone (`git ls-remote --heads origin <branch>`) and delete it with `git push origin --delete <branch>` if it isn't.
 - With `keep`, leave both branches in place.
+- If `.raquinos-flow/` exists at the repository root, delete it with `rm -rf .raquinos-flow`, with or without `keep`: the task is delivered and its specs are recorded in the PR/MR. This happens only here, after the merge. When the skill stops earlier (conflict, failed pipeline, refused merge), the directory stays, so the specs are still there for the next run.
 
 ## 9. Report
 
-Tell the user in a few lines: the PR/MR link, the version it was bumped to (or that it already was, or that there is no version file), the pipeline result, whether it was merged, and whether the branch was deleted or kept. When it stopped early (conflict, failed pipeline, refused merge), say what is blocking it and what to do next.
+Tell the user in a few lines: the PR/MR link, the version it was bumped to (or that it already was, or that there is no version file), the pipeline result, whether it was merged, whether the branch was deleted or kept, and, when there were specs, how many were recorded in the PR/MR, which ones weren't `concluida`, and that `.raquinos-flow/` was deleted. When it stopped early (conflict, failed pipeline, refused merge), say what is blocking it and what to do next.
