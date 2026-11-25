@@ -25,7 +25,12 @@ If the arguments contain `keep`, keep the branch after the merge. Otherwise dele
   1. **Finish anyway**: continue, and the PR/MR records those specs as incomplete.
   2. **Cancel**: stop here without changing anything, so the user can complete them and run `/flow:finish` again.
 
-  Ask this once per run, before anything is pushed, bumped or opened. If every spec is `concluida`, or there are no specs, continue without asking.
+  Ask this once per run, before anything is pushed, bumped or opened.
+- **Pending worktrees**: if `git worktree list` shows worktrees under `.raquinos-flow/worktrees/`, or `git branch --list 'flow-dev/*'` shows branches, `/flow:dev` left spec work that was never integrated into this branch (a conflict, or a run that was stopped). List them for the user, with the spec each one belongs to and whether it has uncommitted changes or commits that aren't on the branch, and ask in the same question as the incomplete specs:
+  1. **Finish anyway**: continue; that work is discarded in step 8.
+  2. **Cancel**: stop here without changing anything, so the user can integrate it or run `/flow:dev` again.
+
+  Never discard them without that answer. If every spec is `concluida`, or there are no specs, continue without asking.
 
 ## 2. Detect the platform
 
@@ -83,7 +88,7 @@ Check whether the version changed during the branch and bump it if it didn't.
 
   **O que foi feito**
 
-  <what the branch actually did for this spec, in a few bullets, taken from the commits and the diff, not copied from the requirements>
+  <what the branch actually did for this spec, in a few bullets, taken from the spec's `## Implementação` section (written by `/flow:dev`) when it has one, and from the commits and the diff; not copied from the requirements>
 
   **Critérios de aceite**
 
@@ -124,7 +129,7 @@ If there were conflicts in step 3, stop here and report.
 - `git switch <default>` and `git pull --ff-only`.
 - Unless `keep` was passed, delete the local branch with `git branch -d <branch>` if it still exists. If the PR/MR was squashed or rebased, `-d` refuses it; use `-D` only after confirming the PR/MR state is merged. Also make sure the remote branch is gone (`git ls-remote --heads origin <branch>`) and delete it with `git push origin --delete <branch>` if it isn't.
 - With `keep`, leave both branches in place.
-- If `.raquinos-flow/` exists at the repository root, delete it with `rm -rf .raquinos-flow`, with or without `keep`: the task is delivered and its specs are recorded in the PR/MR. This happens only here, after the merge. When the skill stops earlier (conflict, failed pipeline, refused merge), the directory stays, so the specs are still there for the next run.
+- If `.raquinos-flow/` exists at the repository root, delete it with `rm -rf .raquinos-flow` followed by `git worktree prune`, and delete any `flow-dev/*` branch with `git branch -D` (the user already agreed to discard them in step 1), with or without `keep`: the task is delivered and its specs are recorded in the PR/MR. This happens only here, after the merge. When the skill stops earlier (conflict, failed pipeline, refused merge), the directory stays, so the specs are still there for the next run.
 
 ## 9. Report
 

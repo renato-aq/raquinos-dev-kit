@@ -133,11 +133,11 @@ Uma ou duas frases: o que passa a existir quando esta spec estiver pronta e por 
 Arquivos e módulos envolvidos, decisões tomadas e suas razões, referências.
 ```
 
-- **Status** is always `pendente` on creation. The other values are `em andamento` and `concluida`; they are set during implementation, not here.
+- **Status** is always `pendente` on creation. The other values are `em andamento` and `concluida`; they are set by `/flow:dev` during implementation, not here.
 - **Depende de** lists the numbers of the specs that must be done first (`000, 001`), or `nenhuma`.
 - Leave out `Fora do escopo` or `Notas` when there is nothing to say. Keep the spec short and direct: if it goes past one screen, it is probably too big and should be split.
 - Don't change existing specs, unless the user asked for it.
 
 ## 7. Report
 
-List the files created, with number and title, in order, and any decision taken by default that the user may want to review. If an ADR was created, say where and whether it is versioned. Remind the user that the specs aren't committed and that `/flow:finish` records them in the PR/MR. Don't start implementing: stop after the report and wait for the user.
+List the files created, with number and title, in order, and any decision taken by default that the user may want to review. If an ADR was created, say where and whether it is versioned. Remind the user that the specs aren't committed and that `/flow:finish` records them in the PR/MR. Suggest `/flow:dev` to implement them. Don't start implementing: stop after the report and wait for the user.
